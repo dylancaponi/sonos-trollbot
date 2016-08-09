@@ -41,7 +41,7 @@ class Trollbot:
         self.set_zone()
         self.main_loop()
 
-    def get_config(self, config_path='config.in'):
+    def get_config(self, config_path='config.ini'):
         Config = ConfigParser.ConfigParser()
         try:
             Config.read(config_path)
@@ -61,6 +61,7 @@ class Trollbot:
                 try:
                     self.sonos = [zone for zone in sonos_discovery if zone.player_name == self.cfg['desired_zone']][0]
                 except:
+                    print 'fail'
                     self.user_select_zone()
         else:
             print 'warning: no zones found. quitting...'
@@ -85,6 +86,13 @@ class Trollbot:
             artist = track['artist']
             title = track['title']
 
+            position = track['position']
+
+            # test
+            # self.troll_repeat(position)
+
+            # print self.sonos.is_playing_radio
+
             # when song changes
             if title != last_title:
                 # output song info
@@ -108,6 +116,15 @@ class Trollbot:
             print 'volume', current_volume, 'exceeds:', self.cfg['max_volume']
             self.sonos.volume = self.cfg['max_volume']
             print 'volume reduced to:', self.cfg['max_volume']
+
+    # simulate cd skipping
+    def troll_repeat(self, position, repeats=4, delay=2):
+        try:
+            for i in range(repeats):
+                self.sonos.seek(position)
+                time.sleep(delay)
+        except:
+            'skipping failed, may be playing radio'
 
     def is_blacklist_tag(self, artist, title):
         # get top tags to check genre
